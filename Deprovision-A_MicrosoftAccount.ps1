@@ -261,21 +261,15 @@ function Set-DeprovisioningOU($ExistingUser){
     $DeprovisionOU = Get-ADOrganizationalUnit -Server $Server -Filter * | where{($_.DistinguishedName -like "*DisabledUsers*") -or ($_.DistinguishedName -like "*Termed*")}
     if($DeprovisionOU){
         if($DeprovisionOU.Length -gt 1){                       $index = 1
-            foreach($_OU in $DeprovisionOU){
-                Try{$_OU | Add-Member -NotePropertyMembers @{Index=$index++} -ErrorAction Stop}Catch{}
+            $DeprovisionOU | select Name | ft
+            $FoundOU = $false
+            while($FoundOU -eq $false){
+                $Selection = Read-Host "Pick a Deprovision OU"
+                $OU = $DeprovisionOU | where{$_.Name -eq $Selection}
+                if($OU){$FoundOU = $true}
             }
-            $DeprovisionOU | select Index,DistinguishedName
-            $Selection = 0
-            while($Selection -le $index){
-                Try{[int]$Selection = Read-Host "Pick an index:" -ErrorAction Stop
-                    $DeprovisionOU = $DeprovisionOU | where{$_.index -eq $Selection}
-                }
-                Catch{$errorMessage = $_.Exception.message
-                    Write-Warning "`t $_.Exception"
-                }
-            } 
         }
-        Try{$ExistingUser | Add-Member -NotePropertyMembers @{DeprovisionOU=$DeprovisionOU} -ErrorAction Stop}Catch{}
+        Try{$ExistingUser | Add-Member -NotePropertyMembers @{DeprovisionOU=$OU} -ErrorAction Stop}Catch{}
     }
 }
 
@@ -321,7 +315,6 @@ function Remove-UserLicenses($ExistingUser){
     }
     else{write-host "No Licenses to Remove."}
 }
-
 
 function Add-LicenseToUser($SkuPartNumber, $ExistingUser){
     $userToOffboard = Get-AzureADUser -ObjectId $ExistingUser.UserPrincipalName
