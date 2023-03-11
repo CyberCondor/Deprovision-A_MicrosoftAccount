@@ -355,7 +355,7 @@ function main{
     $AccountToDeprovision = $null
     $TempVar = $null
     while(($AccountToDeprovision -eq $null) -and ($TempVar -ne "Q")){
-        $TempVar = Read-Host -Prompt "`nEnter the name, email, or SAMAccountName of the user that HR requested to be Deprovisioned (Q to quit)"
+        $TempVar = Read-Host -Prompt "`nEnter the name, email, or SAMAccountName of the user to be deprovisioned (Q to quit)"
         if($TempVar -ne "Q"){$AccountToDeprovision = Locate-ExistingUser $TempVar $ExistingUsers}
     }
     if($TempVar -eq "Q"){break}
@@ -640,6 +640,6 @@ Write-Host "$($UserRunningThisProgram.Name) ($($UserRunningThisProgram.Title)) -
 
 $quit = "p"
 while($quit -ne "q"){
-    $quit = Read-Host "`nEnter to 'q' to quit or anything else to Deprovision a Microsoft Account"
+    $quit = Read-Host "`nEnter 'q' to quit or anything else to Deprovision a Microsoft Account"
     if($quit -ne "q"){main}
 }
